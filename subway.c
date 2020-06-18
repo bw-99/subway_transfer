@@ -5,25 +5,51 @@
 #define MAX_SIZE 100
 
 
-int matrix[12][12] = {
-	{0,1,1000,1000,1000,1000,1000,1000,4,3,1000,1000},	//미남
-	{1,0,1,1000,1000,1000,1000,1000,1000,1000,1000,1000},//동래
-	{1000,1,0,6,1000,1000,1000,1000,1000,1,1000,1},		//교대
-	{1000,1000,6,0,3,1000,1000,1000,1000,1000,1000,1000},//백스코
-	{1000,1000,1000,3,0,11,1000,1000,1000,1000,1000,4},	//수영
-	{1000,1000,1000,1000,11,0,8,1000,1000,1000,1,1000},//서면
-	{1000,1000,1000,1000,1000,8,0,6,6,1000,1000,1000},//사상
-	{1000,1000,1000,1000,1000,1000,6,0,4,1000,1000,1000},//대저
-	{4,1000,1000,1000,1000,1000,6,4,0,1000,1000,1000},//덕천
-	{3,1000,1,1000,1000,1000,1000,1000,1000,0,2,1},//거제
-	{1000,1000,1000,1000,1000,1,1000,1000,1000,2,0,3},//부천
-	{1000,1000,1,1000,4,1000,1000,1000,1000,1,3,0}	//연산
+
+int matrix2[MAX_SIZE][MAX_SIZE];
+int matrix[MAX_SIZE][MAX_SIZE];
+int link[100][30] = { 0, };
+int top2 = 0;
+int distance[MAX_SIZE];
+int found[MAX_SIZE];
+int n = MAX_SIZE;
+
+int top = 0;
+typedef struct transfer* pointer;
+
+pointer stack[MAX_SIZE];
+pointer stack2[MAX_SIZE];
+
+typedef struct transfer {
+	int name;
+	pointer next;
 };
 
-int distance[12];
-int found[12];
-int n = 12;
+void init() {
+	for (int i = 0; i < MAX_SIZE; i++) {
+		stack[i] = (pointer)malloc(sizeof(*stack[0]));
+	}
+}
 
+void transpate() {
+	for (int i = 0; i < MAX_SIZE; i++) {
+		stack2[i] = (pointer)malloc(sizeof(*stack2[0]));
+		stack2[i] = stack[i];
+	}
+}
+
+
+//push 함수 손보기
+void push(int a, int b) {
+	/* showing a,b connected */
+	pointer k_next = (pointer)malloc(sizeof(*k_next));
+	stack[a]->name = a;
+	k_next = stack[a]->next;
+	k_next->name = b;
+	
+	stack[a] = stack[a]->next;
+
+}
 int choose() { 
 	/* find smallest distance not yet checked */ 
 	int i, min, minpos; 
@@ -37,12 +63,16 @@ int choose() {
 	return minpos; 
 }
 
-void shortestPath(int v){
+void shortestPath(int v,int n2){
+	init();
+	transpate();
+
 	int i, u, w;
 	for (i = 0; i < n; i++) {
 		found[i] = 0;
 		distance[i] = matrix[v][i];
 	}
+	int tag = 0;
 	found[v] = 1;
 	distance[v] = 0;
 	for (i = 0; i < n - 2; i++) {
@@ -50,24 +80,20 @@ void shortestPath(int v){
 		found[u] = 1;
 		for (w = 0; w < n; w++)
 			if (!found[w])
-				if (distance[u] + matrix[u][w] < distance[w])
+				if (distance[u] + matrix[u][w] < distance[w]) {
+					push(u, w);
 					distance[w] = distance[u] + matrix[u][w];
+					matrix[v][w] = distance[w];
+					matrix[w][v] = matrix[v][w];
+				}
 	}
-	printf("%d번째 환승역\t\t", v+1);
-	for (i = 0; i < n; i++) {
-		printf("%d\t", distance[i]);
-	}
-	printf("\n\n");
-	/* for i */
 }
 
 
 
 
 
-typedef struct transfer* pointer;
 
-pointer stack[MAX_SIZE];
 
 // 1호선	25 서면 26 부전 29 연산 30 교대 31 동래 (1~40 : 1호선)
 // 2호선	45 백스코 48 수영 59 서면 67 사상 73 덕천 (41~83 : 2호선)
@@ -83,25 +109,64 @@ pointer stack[MAX_SIZE];
 //3호선		수영 대저
 //4호선		미남 안평
 //5호선		
-typedef struct transfer {
-	int name;
-	pointer line[3];
-};
 
-int top = -1;
 
-void push(pointer a) {
-	if (top == MAX_SIZE) {
-		return;
+int speculate(int p) {
+	int sum = 0;
+	int i = 0;
+	for (i; i < MAX_SIZE; i++) {
+		if (matrix2[p][i] == 1)
+			sum++;
 	}
-	stack[++top] = a;
+	if (sum == 2)
+		return 1;
+	else
+		return 0;
 
 }
 
-
 main() {
 	int i = 0;
-	for (i; i < 12; i++) {
-		shortestPath(i);
+	int j = 0;
+	int n1, n2;
+	for (i=0; i < MAX_SIZE; i++) {
+		for (j = 0; j < MAX_SIZE; j++) {
+			scanf("%d", &matrix[i][j]);
+			matrix2[i][j] = matrix[i][j];
+			//printf("abcdffsfasdlkfjaldfkjaef");
+		}
 	}
+
+	printf("\n출발지와 목적지 선택\n");
+	scanf("%d %d", &n1, &n2);
+	/*for (i=0; i < MAX_SIZE; i++) {
+		for (j = 0; j < MAX_SIZE; j++) {
+			printf("%d ", matrix[i][j]);
+		}
+		printf("\n");
+	}*/
+
+
+	for (i = 0; i < MAX_SIZE; i++) {
+		if (i == n1) {
+			shortestPath(i,n2);
+		}
+		else {
+			shortestPath(i,0);
+		}
+		
+	}
+	i = 0;
+	printf("%d정거장 지남\n", matrix[n1][n2]);
+
+	while (link[i]) {
+		printf("%d-\t", link[i]);
+		if (speculate(i) == 1)
+			printf("\t환승역 아님\n");
+		else
+			printf("\t환승역\n");
+		
+		i++;
+	}
+
 }
