@@ -118,13 +118,99 @@ void dfs(int p,int q) {
 		push(a);
 		a = a->next[a->k];
 		a->prev = tmp;
-
-		
-
 	}
+	push(a);
+}
+int overlap(int k,int list[],int len) {
+	int sum = 0;
+	int i = 0;
+	for (i; i < len; i++) {
+		if (list[i] == k)
+			sum++;
+	}
+	if (sum == 1)
+		return 0;
+	else
+		return 1;
+
+}
+
+int* find(int list[], int k, int len) {
+	int sum = 0;
+	int i = 0;
+	int j = 0;
+	int l = 0;
+	int* most = (int*)malloc(sizeof(int) * 2);
+	for (i; i < len; i++) {
+		if (list[i] == k && sum == 0) {
+			l = i;
+			sum++;
+		}
+		else if (list[i] == k && sum>0) {
+			j = i;
+			sum++;
+		}
+			
+	}
+	most[0] = l;
+	most[1] = j;
+	return most;
+
+}
+
+void leftshift(int list[], int* most, int len) {
+	int buffer[100] = { 0, };
+	int i = 0;
+	for (i; i < len; i++) {
+		buffer[i] = list[i];
+	}
+	for (i = 0; i < most[0]; i++) {
+		buffer[i] = list[i];
+	}
+	int j = i;
+	for (i = most[1]; i < len; i++) {
+		buffer[j++] = list[i];
+	}
+	for (i = 0; i < j; i++) {
+		list[i] = buffer[i];
+	}
+	list[i] = -1;
+}
+void printarray(int list[]) {
+	int i = 0;
+	while (list[i] != -1) {
+		printf("%d ", list[i++]);
+	}
+	printf("\n%d stations\n", i);
+}
+void rearrange(int list[], int len) {
+	int list2[100] = { 0, };
+	int i = 0;
+	for (i; i < len; i++) {
+		list2[i] = list[i];
+	}
+	for (i = 0; i < len; i++) {
+		list[i] = list2[len - i - 1];
+	}
+	/* บนป็ */
+	int tmp;
+	int* most = (int*)malloc(sizeof(int) * 2);
+	for (i = 0; i < len; i++) {
+		tmp = overlap(list[i],list,len);
+		if (tmp) {
+			most=find(list, list[i],len);
+			leftshift(list, most,len);
+			
+		}
+	}
+	printarray(list);
+	
+
+
 }
 main() {
 	FILE* fp;
+	int list[100] = { 0, };
 	fp = fopen("input.txt","r");
 	if (fp == NULL) {
 		printf("error");
@@ -141,7 +227,6 @@ main() {
 			fscanf(fp,"%d", &matrix[i][j]);
 		}
 	}
-	printf("\n\n\n");
 
 	init();
 	for (i = 0; i < MAX_SIZE; i++) {
@@ -149,7 +234,7 @@ main() {
 	}
 	link a, b;
 	a = (link)malloc(sizeof(*a));
-	b = (link)malloc(sizeof(*b));
+	//b = (link)malloc(sizeof(*b));
 
 	int n3, n4;
 	printf("\nwhere to where\n");
@@ -157,19 +242,21 @@ main() {
 	getchar();
 
 	dfs(n3, n4);
-	/*a = stack[n3];
-	b = stack[n4];
+	//b = stack[n4];
 	int k = 0;
-	printf("%d-", a->vertex);
-	while (a->next[k]) {
-		printf("%d-", a->next[k++]->vertex);
+
+
+	a = pop();
+	int lm = 0;
+	while (a) {
+		list[lm] = a->vertex;
+		//printf("%d-", list[lm]);
+		lm++;
+		a = pop();
 	}
-	printf("\n");
-	k = 0;
-	printf("%d-", b->vertex);
-	while (b->next[k]) {
-		printf("%d-", b->next[k++]->vertex);
-	}*/
+
+
+	rearrange(list, lm);
 
 
 	return;
