@@ -1,8 +1,8 @@
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_SIZE 10000
+#define MAX_SIZE 50
 #define INT_MAX 999999999
 
 
@@ -15,108 +15,163 @@ int n = MAX_SIZE;
 
 int top = 0;
 
+typedef struct station* link;
+typedef struct station {
+	int vertex;
+	link next[8];
+	int way;
+	int k;			//next[k]부터 다시 시작
+	int prev;
+};
 
-int choose() { 
-	/* find smallest distance not yet checked */ 
-	int i, min, minpos; 
-	min = INT_MAX; 
-	minpos = -1; 
-	for (i = 0; i < n; i++) 
-		if (distance[i] < min && !found[i]) { 
-			min = distance[i]; 
-			minpos = i; 
-		} 
-	return minpos; 
+link stack[100];
+
+int pushtop = -1;
+link stack2[1000];
+
+void push(link a) {
+	stack2[++pushtop] = a;
+	return;
 }
 
-void shortestPath(int v){
-
-	int i, u, w;
-	for (i = 0; i < n; i++) {
-		found[i] = 0;
-		distance[i] = matrix[v][i];
-	}
-	int tag = 0;
-	found[v] = 1;
-	distance[v] = 0;
-	for (i = 0; i < n - 2; i++) {
-		u = choose();
-		found[u] = 1;
-		for (w = 0; w < n; w++)
-			if (!found[w])
-				if (distance[u] + matrix[u][w] < distance[w]) {
-					distance[w] = distance[u] + matrix[u][w];
-					matrix[v][w] = distance[w];
-					matrix[w][v] = matrix[v][w];
-				}
-	}
+link pop() {
+	return stack2[pushtop--];
 }
-
-int speculate(int p) {
-	int sum = 0;
+void init() {
 	int i = 0;
 	for (i; i < MAX_SIZE; i++) {
-		if (matrix2[p][i] == 1)
-			sum++;
+		stack[i] = (link)malloc(sizeof(*stack[i]));
+		stack[i]->vertex = i;
+		/*stack2[i]= (link)malloc(sizeof(*stack2[i]));
+		stack2[i] = stack[i];*/
 	}
-	if (sum == 2)
-		return 1;
-	else
-		return 0;
+}
+void connect(int i) {
+	printf("\nconnect start\n");
+	int j;
+	link a = (link)malloc(sizeof(*a));
+	link b= (link)malloc(sizeof(*b));
+	link c = (link)malloc(sizeof(*c));
+	link d= (link)malloc(sizeof(*d));
+	link e = (link)malloc(sizeof(*e));
+	link f = (link)malloc(sizeof(*f));
+	link g = (link)malloc(sizeof(*g));
+	link h = (link)malloc(sizeof(*h));
+	link m = (link)malloc(sizeof(*m));
 
+	printf("\n");
+	a = stack[i];
+	a->k = -1;
+	printf("%d-\n", a->vertex);
+	int k = 0;
+	for (j = 0; j < MAX_SIZE; j++) {
+		
+		if (matrix[i][j] == 1) {
+			//printf("\n\t%d\t\t%d\n", k,j);
+			if (k <= 7) {
+				stack[j]->k = -1;
+				printf("%d-", stack[j]->vertex);
+				a->next[k++] = stack[j];
+				a->way = k;
+				a->prev = -1;
+				stack[j]->prev = -1;
+			}
+			printf("\tk : %d\t way : %d\n", stack[j]->k, a->way);
+		}
+		//
+	}
+	
+	printf("\n");
 }
 
+
+void dfs(int p,int q) {
+	link a = (link)malloc(sizeof(*a));
+	a = stack[p];
+	push(a);
+	int index;
+	int k = 0;
+	int tmp;
+	while (a!=stack[q]) {
+		while (a->way <= a->k + 2) {
+			printf("\npop\n");
+			a = pop();
+		}
+
+		printf("\nindex : %d \t way : %d\n", a->k,a->way);
+		a->k++;
+		tmp = a->vertex;
+		
+		//tmp = a->vertex;
+		//printf("\n%d %d\n", a->next[a->k]->vertex, a->prev);
+		if (a->next[a->k]->vertex == a->prev ) {
+			if (a->k < 7)
+				a->k++;
+			else {
+				a = pop();
+				printf("\npop\n");
+			}
+
+		}
+
+		printf("\nfind %d \t next search is %d\n", a->vertex, a->next[a->k]->vertex);
+		push(a);
+		a = a->next[a->k];
+		a->prev = tmp;
+
+		
+
+	}
+}
 main() {
 	FILE* fp;
-	fp = fopen("./input.txt","r");
+	fp = fopen("input.txt","r");
+	if (fp == NULL) {
+		printf("error");
+		return;
+	}
+	else {
+		printf("success\n");
+	}
 	int i = 0;
 	int j = 0;
 	int n1, n2;
 	for (i=0; i < MAX_SIZE; i++) {
 		for (j = 0; j < MAX_SIZE; j++) {
 			fscanf(fp,"%d", &matrix[i][j]);
-			matrix2[i][j] = matrix[i][j];
-			//printf("abcdffsfasdlkfjaldfkjaef");
 		}
 	}
-	/*for (i = 0; i < MAX_SIZE; i++) {
-		shortestPath(i);
-	}*/
+	printf("\n\n\n");
 
-	printf("\npress first and final station\n");
-	scanf("%d %d", &n1, &n2);
+	init();
+	for (i = 0; i < MAX_SIZE; i++) {
+		connect(i);
+	}
+	link a, b;
+	a = (link)malloc(sizeof(*a));
+	b = (link)malloc(sizeof(*b));
+
+	int n3, n4;
+	printf("\nwhere to where\n");
+	scanf("%d %d", &n3, &n4);
 	getchar();
-	shortestPath(n1);
-	/*for (i=0; i < MAX_SIZE; i++) {
-		for (j = 0; j < MAX_SIZE; j++) {
-			printf("%d ", matrix[i][j]);
-		}
-		printf("\n");
+
+	dfs(n3, n4);
+	/*a = stack[n3];
+	b = stack[n4];
+	int k = 0;
+	printf("%d-", a->vertex);
+	while (a->next[k]) {
+		printf("%d-", a->next[k++]->vertex);
+	}
+	printf("\n");
+	k = 0;
+	printf("%d-", b->vertex);
+	while (b->next[k]) {
+		printf("%d-", b->next[k++]->vertex);
 	}*/
 
 
-	
-	printf("%d subway\n", matrix[n1][n2]);
-
-	printf("press c to continue\nor anything to finish\n");
-	char a;
-	//rewind(stdin);
-	//rewind(fp);
-	while (1) {
-		scanf("%c", &a);
-		if (a == 'c') {
-			printf("\npress first and final station\n");
-			scanf("%d %d", &n1, &n2);
-			shortestPath(n1);
-			printf("%d subway\n", matrix[n1][n2]);
-			getchar();
-			printf("press c to continue\nor anything to finish\n");
-		}
-		else {
-			break;
-		}
-		
-	}
 	return;
 
 }
