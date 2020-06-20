@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_SIZE 10000
+#define MAX_SIZE 1000
 #define INT_MAX 999999999
 
 
@@ -19,6 +19,7 @@ int top = 0;
 
 int top_push = -1;
 int pur;
+
 typedef struct station* link;
 typedef struct station {
 	int ver;
@@ -141,7 +142,7 @@ void shortestPath(int v,int f){
 		found[u] = 1;
 		for (w = 0; w < n; w++)
 			if (!found[w])
-				if (distance[u] + matrix[u][w] < distance[w]) {
+				if (distance[u] + matrix[u][w]+ 3< distance[w]) {
 					link a = (link)malloc(sizeof(*a));
 					link b = (link)malloc(sizeof(*b));
 					a->ver = u;
