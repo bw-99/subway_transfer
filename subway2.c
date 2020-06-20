@@ -1,8 +1,9 @@
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_SIZE 100
+#define MAX_SIZE 10000
 #define INT_MAX 999999999
 
 
@@ -24,14 +25,14 @@ typedef struct station {
 	link next;
 };
 
-link stack[100];
+link stack[MAX_SIZE*5];
 
 
 typedef struct pos {
 	int ver;
 }pos;
 
-pos stack2[100];
+pos stack2[MAX_SIZE*5];
 
 
 void push(int k) {
