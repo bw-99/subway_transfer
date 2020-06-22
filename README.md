@@ -1,7 +1,7 @@
 # subway_transfer
  
  
- <li> 1. dfs를 활용한 프로그램 = 
+ <li> 1. dfs를 활용한 프로그램 = tree 브랜치
  
  <li> 2. dijkstra를 활용한 프로그램 = graph 브랜치
  
