@@ -52,20 +52,6 @@ void shortestPath(int v){
 	}
 }
 
-int speculate(int p) {
-	int sum = 0;
-	int i = 0;
-	for (i; i < MAX_SIZE; i++) {
-		if (matrix2[p][i] == 1)
-			sum++;
-	}
-	if (sum == 2)
-		return 1;
-	else
-		return 0;
-
-}
-
 main() {
 	FILE* fp;
 	fp = fopen("./input.txt","r");
@@ -79,20 +65,13 @@ main() {
 			//printf("abcdffsfasdlkfjaldfkjaef");
 		}
 	}
-	/*for (i = 0; i < MAX_SIZE; i++) {
-		shortestPath(i);
-	}*/
+
 
 	printf("\npress first and final station\n");
 	scanf("%d %d", &n1, &n2);
 	getchar();
 	shortestPath(n1);
-	/*for (i=0; i < MAX_SIZE; i++) {
-		for (j = 0; j < MAX_SIZE; j++) {
-			printf("%d ", matrix[i][j]);
-		}
-		printf("\n");
-	}*/
+
 
 
 	
